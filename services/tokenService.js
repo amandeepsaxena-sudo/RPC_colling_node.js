@@ -17,17 +17,51 @@ const getTotalSupply = async () => {
     return (await contract.totalSupply()).toString();
 };
 
-const mintToken  = async (to , amount) => {
+const mintToken = async (to, amount) => {
     console.log("Minting tokens...");
     console.log(to, amount);
     const tx = await contract.mintToke(to, amount);
-    console.log("Transaction sent. Waiting for confirmation...", tx );
+    console.log("Transaction sent. Waiting for confirmation...", tx);
     await tx.wait();
     return tx;
 };
+
 const getBalance = async (address) => {
     return (await contract.balanceOf(address)).toString();
 };
 
+const tokneTransfer = async (to, amount) => {
+    console.log("Transferring tokens...");
+    console.log(to, amount);
+    const tx = await contract.transfer(to, amount);
+    console.log("Transaction sent. Waiting for confirmation...", tx);
+    await tx.wait();
+    return tx;
+}
 
-module.exports = { getTotalSupply, getBalance , mintToken};
+const borunToke = async (to, amount) => {
+    console.log("Burning tokens...");
+    console.log(to, amount);
+    return await contract.burn(ethers.parseEther().toString, 10).then((tx) => {
+        console.log("Transaction sent. Waiting for confirmation...", tx);
+        return tx.wait().then(() => tx);
+    }).catch((error) => {
+        console.error("Error burning tokens:", error);
+        throw error;
+    });
+}
+
+const checkNetwork = async () => { 
+    const network = await provider.getNetwork();
+    console.log("Connected to network:", network);
+    return network;
+};
+
+const getTransactionStatus = async (txHash) => {
+    const txReceipt = await provider.getTransactionReceipt(txHash); 
+    console.log("Transaction receipt:", txReceipt);
+    return txReceipt;
+}
+
+
+module.exports = { getTotalSupply, getBalance, mintToken, tokneTransfer, borunToke ,checkNetwork ,getTransactionStatus};
